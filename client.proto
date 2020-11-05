@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_outer_classname = "KVProto";
+option java_package = "client.proto";
+
+package client;
+
+service KV {
+    rpc execute (Request) returns (Response);
+}
+
+message Request {
+    int64 id = 1;
+    uint64 timeout = 2; // in millis
+    string body = 3;
+}
+
+message Response {
+    oneof result {
+        ReadResult read = 1;
+        RedirectTo redirect_to = 2;
+        Empty nodes_unreachable = 3;
+        LostLeadership lost_leadership = 4;
+        Empty closing = 5;
+        Empty timeout = 6;
+        Empty too_many_requests = 7;
+        string compile_error = 8;
+    }
+}
+
+message ReadResult {
+    map<string, string> value = 1;
+}
+
+message Empty {}
+
+message LostLeadership {
+    oneof maybe_id {
+        int64 id = 1;
+    };
+    bool could_handle = 2;
+}
+
+message RedirectTo {
+    oneof maybe_id {
+        int64 id = 1;
+    };
+}
